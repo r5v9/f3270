@@ -2,9 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/main/resources"/>
-	<classpathentry kind="src" path="src/unit-tests/java"/>
 	<classpathentry kind="src" path="src/integration-tests/java"/>
-	<classpathentry kind="src" path="src/functional-tests/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?ivyXmlPath=ivy.xml&amp;confs=test&amp;ivySettingsPath=project%3A%2F%2F%2Fconf%2Fbuild%2Fivysettings.xml"/>
 	<classpathentry kind="output" path="bin"/>

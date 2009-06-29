@@ -1,6 +1,10 @@
-package net.sf.f3270;
+package net.sf.f3270.ipaustralia;
 
 import static org.junit.Assert.assertTrue;
+
+import net.sf.f3270.IntegrationTestBase;
+import net.sf.f3270.Terminal;
+import net.sf.f3270.IntegrationTestBase.Mode;
 
 import org.junit.Test;
 
