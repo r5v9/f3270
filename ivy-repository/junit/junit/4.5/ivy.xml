@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0">
+    <info organisation="junit" module="junit" revision="4.5" status="release" default="true"/>
+    <configurations>
+        <conf name="default" visibility="public"/>
+        <conf name="source" visibility="public"/>
+    </configurations>
+    <publications>
+        <artifact name="junit" type="jar" ext="jar" conf="default"/>
+        <artifact name="junit" type="source" ext="src.jar" conf="source"/>
+    </publications>
+</ivy-module>

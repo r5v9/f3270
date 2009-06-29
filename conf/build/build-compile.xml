@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+
+    <target name="ivy-dependencies">
+        <fail message="[ivy-dependencies] target should be defined outside the scope of build-compile"/>
+    </target>
+
+    <target name="post-compile">
+        <echo message="no post-compile operations defined"/>
+    </target>
+
+    <target name="compile" depends="ivy-dependencies, compile-all, post-compile" description="compile all source folders"/>
+
+    <target name="compile-all">
+        <compile-folder folder="main" classpathref="compile.classpath"/>
+        <compile-folder folder="unit-tests" classpathref="test.classpath"/>
+        <compile-folder folder="integration-tests" classpathref="test.classpath"/>
+        <compile-folder folder="functional-tests" classpathref="test.classpath"/>
+    </target>
+
+    <macrodef name="compile-folder">
+        <attribute name="folder" />
+        <attribute name="classpathref" />
+        <sequential>
+            <compile-generic sourceFolder="src/@{folder}/java" targetFolder="target/classes/@{folder}" resourcesFolder="src/@{folder}/resources" classpathref="@{classpathref}"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="compile-generic">
+        <attribute name="sourceFolder" />
+        <attribute name="resourcesFolder" />
+        <attribute name="targetFolder" />
+        <attribute name="classpathref" />
+        <sequential>
+            <if>
+                <available file="${basedir}/@{sourceFolder}" type="dir"/>
+                <then>
+                    <echo message="compiling @{sourceFolder}"/>
+                    <mkdir dir="${basedir}/@{targetFolder}"/>
+                    <javac srcdir="${basedir}/@{sourceFolder}" destdir="${basedir}/@{targetFolder}" source="1.5" target="1.5" debug="true">
+                        <classpath>
+                            <path refid="@{classpathref}"/>
+                            <pathelement location="${basedir}/target/classes/main" />
+                        </classpath>
+                    </javac>
+                    <copy todir="${basedir}/@{targetFolder}">
+                        <fileset dir="${basedir}/@{sourceFolder}" excludes="**/*.java"/>
+                    </copy>
+                </then>
+            </if>
+            <if>
+                <available file="${basedir}/@{resourcesFolder}" type="dir"/>
+                <then>
+                    <mkdir dir="${basedir}/@{targetFolder}" />
+                    <copy todir="${basedir}/@{targetFolder}">
+                        <fileset dir="${basedir}/@{resourcesFolder}" />
+                    </copy>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+</project>

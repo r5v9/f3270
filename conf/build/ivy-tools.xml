@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0">
+
+    <info organisation="f3270" module="f3270"/>
+
+    <configurations>
+        <conf name="checkstyle" />
+        <conf name="cobertura" />
+    </configurations>
+
+    <dependencies>
+        <dependency org="checkstyle" name="checkstyle" rev="4.4" conf="checkstyle->*"/>
+        <dependency org="cobertura" name="cobertura" rev="1.9.1" conf="cobertura->*"/>
+    </dependencies>
+
+</ivy-module>

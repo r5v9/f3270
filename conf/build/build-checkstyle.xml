@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+
+    <target name="ivy-dependencies">
+        <fail message="[ivy-dependencies] target should be defined outside the scope of build-checkstyle"/>
+    </target>
+
+    <target name="compile">
+        <fail message="[compile] target should be defined outside the scope of build-checkstyle"/>
+    </target>
+
+    <target name="checkstyle" depends="ivy-dependencies">
+        <mkdir dir="${basedir}/target/checkstyle" />
+        <run-checkstyle src.dir="main" conf="tests"/>
+        <run-checkstyle src.dir="unit-tests" conf="tests"/>
+        <run-checkstyle src.dir="integration-tests" conf="tests"/>
+        <run-checkstyle src.dir="functional-tests" conf="tests"/>
+        <fail if="checkstyle.failed" message="Checkstyle failed" />
+    </target>
+
+    <macrodef name="run-checkstyle">
+        <attribute name="src.dir" />
+        <attribute name="conf" />
+        <sequential>
+            <if>
+                <available file="${basedir}/src/@{src.dir}/java" type="dir"/>
+                <then>
+                    <taskdef resource="checkstyletask.properties" classpathref="checkstyle.classpath" />
+                    <checkstyle config="${basedir}/conf/checkstyle/@{conf}.xml" failOnViolation="false" failureProperty="checkstyle.failed">
+                        <fileset dir="${basedir}/src/@{src.dir}/java" includes="**/*.java" />
+                        <formatter type="plain" />
+                        <formatter type="xml" tofile="${basedir}/target/checkstyle/@{src.dir}.xml" />
+                        <classpath>
+                            <path refid="test.classpath" />
+                        </classpath>
+                        <property key="checkstyle.cache.file" file="${java.io.tmpdir}/@{src.dir}.cachefile" />
+                    </checkstyle>
+                    <xslt in="${basedir}/target/checkstyle/@{src.dir}.xml" out="${basedir}/target/checkstyle/@{src.dir}.html" style="${basedir}/conf/checkstyle/checkstyle-simple.xsl" />
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+</project>

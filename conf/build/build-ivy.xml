@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+
+	<import file="build-bootstrap.xml" />
+
+    <taskdef name="ivy-configure" classname="org.apache.ivy.ant.IvyConfigure" loaderRef="ivy.loader" classpathref="ivy.classpath"/>
+    <taskdef name="ivy-info" classname="org.apache.ivy.ant.IvyInfo" loaderRef="ivy.loader" classpathref="ivy.classpath"/>
+    <taskdef name="ivy-resolve" classname="org.apache.ivy.ant.IvyResolve" loaderRef="ivy.loader" classpathref="ivy.classpath"/>
+    <taskdef name="ivy-cachepath" classname="org.apache.ivy.ant.IvyCachePath" loaderRef="ivy.loader" classpathref="ivy.classpath"/>
+    <taskdef name="ivy-publish" classname="org.apache.ivy.ant.IvyPublish" loaderRef="ivy.loader" classpathref="ivy.classpath"/>
+    <taskdef name="ivy-report" classname="org.apache.ivy.ant.IvyReport" loaderRef="ivy.loader" classpathref="ivy.classpath"/>
+
+	<target name="ivy-dependencies-setup">
+        <ivy-configure file="${basedir}/conf/build/ivysettings.xml"/>
+    </target>
+
+    <target name="ivy-dependencies-common" depends="ivy-dependencies-setup">
+        <ivy-resolve file="${basedir}/conf/build/ivy-tools.xml" log="download-only"/>
+        <ivy-cachepath pathid="checkstyle.classpath" conf="checkstyle" type="jar" />
+        <ivy-cachepath pathid="cobertura.classpath" conf="cobertura" type="jar" />
+    </target>
+
+    <target name="ivy-dependencies" depends="ivy-dependencies-common">
+        <ivy-resolve file="ivy.xml" log="download-only"/>
+        <ivy-cachepath pathid="default.classpath" conf="default" type="jar" />
+        <ivy-cachepath pathid="compile.classpath" conf="compile" type="jar" />
+        <ivy-cachepath pathid="test.classpath" conf="test" type="jar" />
+    </target>
+
+    <target name="publish">
+    	<property file="${basedir}/revision.properties"/>
+        <ivy-publish resolver="local" pubrevision="${release}" overwrite="true">
+            <artifacts pattern="${basedir}/target/dist/[artifact].[ext]" />
+        </ivy-publish>
+    </target>
+
+    <target name="ivy-dependencies-report" depends="ivy-dependencies">
+        <delete dir="${basedir}/target/ivy-report" />
+        <mkdir dir="${basedir}/target/ivy-report" />
+        <ivy-report todir="${basedir}/target/ivy-report" />
+    </target>
+
+	<target name ="purge-ivy-cache">
+		<delete dir="${user.home}/ivy" failonerror="true"/>
+	</target>
+
+</project>

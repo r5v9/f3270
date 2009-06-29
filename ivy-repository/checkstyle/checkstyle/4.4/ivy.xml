@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0">
+	<info organisation="checkstyle" module="checkstyle" revision="4.4" status="release" default="true"/>
+	<configurations>
+		<conf name="default" visibility="public"/>
+		<conf name="src" visibility="public"/>
+	</configurations>
+	<publications>
+		<artifact name="checkstyle" type="jar" ext="jar" conf="default"/>
+		<artifact name="checkstyle-optional" type="jar" ext="jar" conf="default"/>
+	</publications>
+	<dependencies>
+		<dependency org="antlr" name="antlr" rev="2.7.7"/>
+		<dependency org="apache" name="commons-beanutils" rev="1.8.0"/>
+		<dependency org="apache" name="commons-cli" rev="1.1"/>
+		<dependency org="apache" name="commons-collections" rev="3.2.1"/>
+		<dependency org="apache" name="commons-logging" rev="1.1.1"/>
+	</dependencies>
+</ivy-module>

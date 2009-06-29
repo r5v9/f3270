@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0">
+
+    <info organisation="f3270" module="f3270"/>
+
+    <configurations>
+        <conf name="default"/>
+        <conf name="compile" extends="default"/>
+        <conf name="test" extends="compile"/>
+    </configurations>
+
+    <publications>
+        <artifact name="f3270" type="jar" ext="jar" conf="default"/>
+    </publications>
+
+    <dependencies>
+        <dependency org="junit" name="junit" rev="4.5" conf="test->default,source"/>
+        <dependency org="apache" name="log4j" rev="1.2.15" conf="default->default,source"/>
+        <dependency org="apache" name="commons-io" rev="1.4" conf="test->default"/>
+    </dependencies>
+
+</ivy-module>

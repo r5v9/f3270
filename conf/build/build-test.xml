@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+
+    <target name="ivy-dependencies">
+        <fail message="[ivy-dependencies] target should be defined outside the scope of build-test" />
+    </target>
+	
+    <target name="compile">
+        <fail message="[compile] target should be defined outside the scope of build-test" />
+    </target>
+	
+	<target name="test" depends="pre-unit-tests, unit-tests, post-unit-tests, pre-integration-tests, integration-tests, post-integration-tests, pre-functional-tests, functional-tests, post-functional-tests" description="runs all tests" />
+
+	<target name="pre-unit-tests"/>
+	<target name="post-unit-tests"/>
+
+    <target name="unit-tests" depends="ivy-dependencies, compile">
+        <cobertura-instrument />
+        <run-tests-sequential folder="unit-tests" />
+        <cobertura-build-report />
+        <fail if="tests-failed" message="unit tests failed" />
+    </target>
+
+	<target name="pre-integration-tests"/>
+	<target name="post-integration-tests"/>
+
+    <target name="integration-tests" depends="ivy-dependencies, compile">
+        <if>
+            <available file="${basedir}/src/integration-tests/java" type="dir" />
+            <then>
+                <path id="integration-tests.coverage.classpath" />
+                <run-tests-sequential folder="integration-tests" />
+                <fail if="tests-failed" message="integration tests failed" />
+            </then>
+        </if>
+    </target>
+
+	<target name="pre-functional-tests"/>
+	<target name="post-functional-tests"/>
+	
+    <target name="functional-tests" depends="ivy-dependencies, compile">
+        <sequential>
+            <if>
+                <available file="${basedir}/src/functional-tests/java" type="dir" />
+                <then>
+                    <run-tests-sequential folder="functional-tests" />
+                	<fail if="tests-failed" message="functional tests failed" />
+                </then>
+            </if>
+        </sequential>
+    </target>
+
+    <macrodef name="run-tests-sequential">
+        <attribute name="folder" />
+        <sequential>
+            <setup-test-report-folders folder="@{folder}" />
+            <run-tests folder="@{folder}" filter="**/*Test.class"/>
+            <create-test-report folder="@{folder}"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="run-tests">
+        <attribute name="folder" />
+        <attribute name="filter" />
+        <sequential>
+            <if>
+                <available file="${basedir}/src/@{folder}/java" type="dir" />
+                <then>
+                    <junit printsummary="yes" fork="yes" forkmode="once" failureproperty="tests-failed">
+                        <sysproperty key="concordion.output.dir" path="${basedir}/target/test-reports/concordion" />
+                        <classpath>
+                            <path refid="test.classpath" />
+                            <pathelement location="${basedir}/target/classes/main" />
+                            <pathelement location="${basedir}/target/classes/@{folder}" />
+                        </classpath>
+                        <formatter type="xml" />
+                        <batchtest fork="yes" todir="${basedir}/target/test-reports/@{folder}/xml">
+                            <fileset dir="${basedir}/target/classes/@{folder}" includes="@{filter}" />
+                        </batchtest>
+                    </junit>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="setup-test-report-folders">
+        <attribute name="folder" />
+        <sequential>
+            <if>
+                <available file="${basedir}/src/@{folder}/java" type="dir" />
+                <then>
+                    <echo message="creating dirs for @{folder}"/>
+                    <delete dir="${basedir}/target/test-reports/@{folder}" includeEmptyDirs="true" failonerror="true" />
+                    <mkdir dir="${basedir}/target/test-reports/@{folder}" />
+                    <mkdir dir="${basedir}/target/test-reports/@{folder}/xml" />
+                    <mkdir dir="${basedir}/target/test-reports/@{folder}/html" />
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="create-test-report">
+        <attribute name="folder" />
+        <sequential>
+            <if>
+                <available file="${basedir}/src/@{folder}/java" type="dir" />
+                <then>
+                    <junitreport todir="${basedir}/target/test-reports/@{folder}/html">
+                        <fileset dir="${basedir}/target/test-reports/@{folder}/xml">
+                            <include name="TEST-*.xml" />
+                        </fileset>
+                        <report format="frames" todir="${basedir}/target/test-reports/@{folder}/html" />
+                    </junitreport>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+	
+    <macrodef name="cobertura-instrument">
+        <sequential>
+            <delete dir="${basedir}/target/cobertura" includeEmptyDirs="true" failonerror="true" />
+            <mkdir dir="${basedir}/target/cobertura" />
+            <taskdef resource="tasks.properties" classpathref="cobertura.classpath" />
+            <mkdir dir="${basedir}/target/cobertura/instrumented" />
+            <cobertura-instrument todir="${basedir}/target/cobertura/instrumented" datafile="${basedir}/target/cobertura/cobertura.ser">
+            	<fileset dir="${basedir}/target/classes/main" includes="**/*.class"/>
+            </cobertura-instrument>
+            <path id="unit-tests.coverage.classpath">
+                <path refid="cobertura.classpath" />
+                <pathelement path="${basedir}/target/cobertura/instrumented" />
+            </path>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="cobertura-build-report">
+        <sequential>
+            <mkdir dir="${basedir}/target/cobertura/report" />
+            <cobertura-report format="html" destdir="${basedir}/target/cobertura/report/html" datafile="${basedir}/target/cobertura/cobertura.ser">
+                <fileset dir="${basedir}/src/main/java" includes="**/*.java" />
+            </cobertura-report>
+            <cobertura-report format="xml" destdir="${basedir}/target/cobertura/report/xml" datafile="${basedir}/target/cobertura/cobertura.ser">
+                <fileset dir="${basedir}/src/main/java" includes="**/*.java" />
+            </cobertura-report>
+        </sequential>
+    </macrodef>
+
+</project>

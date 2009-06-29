@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+
+    <target name="compile">
+        <fail message="[compile] target should be defined outside the scope of build-package"/>
+    </target>
+
+    <target name="create-dist-folder">
+        <mkdir dir="${basedir}/target/dist" />
+    </target>
+	
+	<target name="pre-build-jar"/>
+
+    <target name="build-jar" depends="pre-build-jar, create-dist-folder, compile">
+        <jar destfile="${basedir}/target/dist/${ivy.module}.jar">
+            <fileset dir="${basedir}/target/classes/main"/>
+        </jar>
+    </target>
+
+	<target name="pre-build-war"/>
+
+    <target name="build-war" depends="pre-build-war, create-dist-folder, compile">
+        <delete dir="${basedir}/target/war" />
+        <mkdir dir="${basedir}/target/war" />
+        <copy todir="${basedir}/target/war/web"/>
+        <copy todir="${basedir}/target/war/WEB-INF">
+            <fileset dir="${basedir}/webapp/WEB-INF"/>
+        </copy>
+        <copy todir="${basedir}/target/war/classes">
+            <fileset dir="${basedir}/target/classes/main" excludes="log4j*.properties"/>
+            <fileset file="conf/log4j.properties"/>
+        </copy>
+        <copy todir="${basedir}/target/war/lib" flatten="true">
+            <path refid="default.classpath" />
+        </copy>
+        <war warfile="${basedir}/target/dist/${ivy.module}.war" webxml="${basedir}/target/war/WEB-INF/web.xml">
+            <lib dir="${basedir}/target/war/lib" />
+            <webinf dir="${basedir}/target/war/WEB-INF" excludes="web.xml" />
+            <fileset dir="${basedir}/target/war/web" />
+            <classes dir="${basedir}/target/war/classes" />
+        </war>
+    </target>
+
+    <target name="build-ear" depends="build-war">
+        <delete dir="${basedir}/target/ear" />
+        <mkdir dir="${basedir}/target/ear" />
+        <copy todir="${basedir}/target/ear">
+            <fileset dir="${basedir}/conf/ear" includes="**/*"/>
+        </copy>
+        <copy todir="${basedir}/target/ear">
+            <fileset file="${basedir}/target/dist/${ivy.module}.war"/>
+        </copy>
+        <zip destfile="${basedir}/target/dist/${ivy.module}.ear" basedir="${basedir}/target/ear"/>
+    </target>
+
+</project>

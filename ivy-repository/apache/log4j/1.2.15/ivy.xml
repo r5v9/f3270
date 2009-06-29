@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0">
+    <info organisation="apache" module="log4j" revision="1.2.15" status="release" default="true"/>
+    <configurations>
+        <conf name="default" visibility="public"/>
+        <conf name="source" visibility="public"/>
+    </configurations>
+    <publications>
+        <artifact name="log4j" type="jar" ext="jar" conf="default"/>
+        <artifact name="log4j" type="source" ext="src.zip" conf="source"/>
+    </publications>
+</ivy-module>

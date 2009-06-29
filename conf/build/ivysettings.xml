@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivysettings>
+
+    <property name="cache.dir" value="${basedir}/../ivy-f3270/cache"/>
+    <property name="3rdParty.dir" value="${basedir}/ivy-repository"/>
+    <property name="local.dir" value="${basedir}/../ivy-f3270/local"/>
+
+    <settings defaultResolver="default" defaultConflictManager="strict">
+        <caches defaultCacheDir="${cache.dir}" checkUpToDate="true"/>
+    </settings>
+
+    <resolvers>
+        <url name="3rdParty">
+            <ivy pattern="file:${3rdParty.dir}/[organisation]/[module]/[revision]/ivy.xml"/>
+            <artifact pattern="file:${3rdParty.dir}/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]"/>
+        </url>
+        <filesystem name="local">
+            <ivy pattern="${local.dir}/[organisation]/[module]/[revision]/ivy.xml"/>
+            <artifact pattern="${local.dir}/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
+        </filesystem>
+        <chain name="default" returnFirst="true">
+            <resolver ref="local"/>
+            <resolver ref="3rdParty"/>
+        </chain>
+    </resolvers>
+
+</ivysettings>

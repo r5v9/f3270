@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fileset-config file-format-version="1.2.0" simple-config="false">
+    <local-check-config name="config-main" location="conf/checkstyle/main.xml" type="project" description="">
+        <additional-data name="protect-config-file" value="false"/>
+    </local-check-config>
+    <local-check-config name="config-tests" location="conf/checkstyle/tests.xml" type="project" description="">
+        <additional-data name="protect-config-file" value="false"/>
+    </local-check-config>
+    <fileset name="main" enabled="true" check-config-name="config-main" local="true">
+        <file-match-pattern match-pattern="^src.main.*java$" include-pattern="true"/>
+    </fileset>
+    <fileset name="tests" enabled="true" check-config-name="config-tests" local="true">
+        <file-match-pattern match-pattern="^src.*-tests.*java$" include-pattern="true"/>
+    </fileset>
+</fileset-config>

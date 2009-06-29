@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="f3270" default="all">
+
+    <target name="all" depends="clean, ivy-dependencies, compile, test, build-jar, publish" />
+	
+	<target name="pre-build-jar">
+		<delete file="target/classes/main/log4j.properties"/>
+	</target>
+	
+    <import file="conf/build/build-ivy.xml" />
+    <import file="conf/build/build-clean.xml" />
+    <import file="conf/build/build-compile.xml" />
+    <import file="conf/build/build-test.xml" />
+    <import file="conf/build/build-checkstyle.xml" />
+    <import file="conf/build/build-package.xml" />
+
+</project>
