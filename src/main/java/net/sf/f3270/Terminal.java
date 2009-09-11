@@ -36,7 +36,6 @@ public class Terminal {
         this.port = port;
         this.type = type;
         this.mode = mode;
-        addDefaultObservers();
     }
 
     private void addDefaultObservers() {
@@ -72,6 +71,7 @@ public class Terminal {
     public Terminal connect() {
         s3270 = new S3270(s3270Path, hostname, port, type, mode);
         updateScreen();
+        addDefaultObservers();
         for (TerminalObserver observer : observers) {
             observer.connect(s3270);
         }
@@ -119,6 +119,14 @@ public class Terminal {
         }
         return sb.toString();
     }
+    
+    public int getWidth() {
+        return s3270.getScreen().getWidth();
+    }
+    
+    public int getHeight() {
+        return s3270.getScreen().getHeight();
+    }
 
     public void enter() {
         assertConnected();
@@ -139,7 +147,13 @@ public class Terminal {
         assertConnected();
         s3270.pa(n);
         updateScreen();
-        commandIssued("pa", null, new Param("n", n));
+    }
+    
+    public void clear() {
+        assertConnected();
+        s3270.clear();
+        updateScreen();
+        commandIssued("clear", null);
     }
 
     public void type(final String text) {

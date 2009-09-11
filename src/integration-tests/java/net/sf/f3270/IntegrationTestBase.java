@@ -48,9 +48,15 @@ public abstract class IntegrationTestBase {
             hostname = getHostname();
             port = 23;
         }
+        
+        String os = System.getProperty("os.name");
+        String s3270Path = "s3270";
+        if (os.toLowerCase().contains("windows")) {
+            s3270Path = "s3270/cygwin/s3270";
+        }
 
-        terminal = new Terminal("s3270/cygwin/s3270", hostname, port, TerminalType.TYPE_3279, TerminalMode.MODE_80_24)
-                .connect();
+        terminal = new Terminal(s3270Path, hostname, port, TerminalType.TYPE_3279, TerminalMode.MODE_80_24);
+        terminal.connect();
     }
 
     protected final void disconnect() {

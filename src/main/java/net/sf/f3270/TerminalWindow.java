@@ -36,6 +36,8 @@ import org.h3270.host.S3270;
 public class TerminalWindow {
 
     private S3270 s3270;
+    private int currentWidth;
+    private int currentHeight;
 
     private Style styleInputChanged;
     private Style styleInput;
@@ -46,6 +48,9 @@ public class TerminalWindow {
     private Style styleReturn;
     private Style styleParamName;
     private Style styleParamValue;
+
+    private final Font monospacedFont = new Font(Font.MONOSPACED, Font.PLAIN, 12);
+    private final Font sansFont = new Font(Font.SANS_SERIF, Font.PLAIN, 11);
 
     private Color[] extendedColors = new Color[] {Color.cyan, Color.blue, Color.red, Color.pink, Color.green,
             Color.magenta, Color.yellow, new Color(198, 198, 198)};
@@ -58,6 +63,7 @@ public class TerminalWindow {
     private DefaultStyledDocument documentDebug;
 
     private JTable fieldsTable;
+    private JTabbedPane tabbedPane;
 
     public TerminalWindow(final S3270 s3270) {
         this.s3270 = s3270;
@@ -101,6 +107,17 @@ public class TerminalWindow {
             }
         }
         textPane3270.setDocument(doc);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    updateTextPane3270Size();
+                    updateTabbedPaneSize();
+//                   frame.pack();
+                } catch (RuntimeException e) {
+                    // do nothing
+                }                    
+            }
+        });
     }
 
     private void updateDebug(final String command, final String returned, final Param... params) {
@@ -177,17 +194,14 @@ public class TerminalWindow {
     }
 
     private void createFrame(final String title) {
-        final Font monospacedFont = new Font("Courier New", Font.PLAIN, 12);
-        final Font sansFont = new Font("Tahoma", Font.PLAIN, 11);
 
-        buildTextPane3270(monospacedFont);
+        buildTextPane3270();
         final JScrollPane tableScroller = buildFieldsTablePanel();
 
-        final JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Terminal", null, textPane3270, "");
         tabbedPane.addTab("Fields", null, tableScroller, "");
-        tabbedPane.setPreferredSize(new Dimension((int) textPane3270.getPreferredSize().getWidth(), (int) textPane3270
-                .getPreferredSize().getHeight() + 40));
+        updateTabbedPaneSize();
 
         final JPanel debugPanel = buildDebugPanel(monospacedFont, sansFont);
 
@@ -204,8 +218,13 @@ public class TerminalWindow {
         frame.setVisible(true);
     }
 
+    private void updateTabbedPaneSize() {
+        tabbedPane.setPreferredSize(new Dimension((int) textPane3270.getPreferredSize().getWidth() + 40,
+                (int) textPane3270.getPreferredSize().getHeight() + 40));
+    }
+
     private JPanel buildDebugPanel(final Font monospacedFont, final Font sansFont) {
-        final JScrollPane textPaneDebugScroller = buildTextPaneDebug(monospacedFont, sansFont);
+        final JScrollPane textPaneDebugScroller = buildTextPaneDebug();
 
         documentDebug = new DefaultStyledDocument();
         textPaneDebug.setDocument(documentDebug);
@@ -219,7 +238,7 @@ public class TerminalWindow {
         return debugPanel;
     }
 
-    private JScrollPane buildTextPaneDebug(final Font monospacedFont, final Font sansFont) {
+    private JScrollPane buildTextPaneDebug() {
         textPaneDebug = createTextPane(sansFont, Color.white);
         textPaneDebug.setAutoscrolls(true);
         textPaneDebug.setBorder(new EmptyBorder(3, 3, 3, 3));
@@ -233,12 +252,22 @@ public class TerminalWindow {
         return textPaneDebugScroller;
     }
 
-    private void buildTextPane3270(final Font monospacedFont) {
+    private void buildTextPane3270() {
         textPane3270 = createTextPane(monospacedFont, Color.black);
-        final FontMetrics fontMetricsMonospaced = textPane3270.getFontMetrics(monospacedFont);
-        textPane3270.setPreferredSize(new Dimension(82 * fontMetricsMonospaced.charWidth(' '),
-                24 * fontMetricsMonospaced.getHeight()));
+        updateTextPane3270Size();
         textPane3270.setAlignmentX(JDialog.LEFT_ALIGNMENT);
+    }
+
+    private void updateTextPane3270Size() {
+        final FontMetrics fontMetricsMonospaced = textPane3270.getFontMetrics(monospacedFont);
+        int w = s3270.getScreen().getWidth();
+        int h = s3270.getScreen().getHeight();
+        if (w != currentWidth || h != currentHeight) {
+            textPane3270.setPreferredSize(new Dimension((w + 2) * fontMetricsMonospaced.charWidth(' '), (h + 2)
+                    * fontMetricsMonospaced.getHeight()));
+            currentWidth = w;
+            currentHeight = h;
+        }
     }
 
     private JScrollPane buildFieldsTablePanel() {
@@ -251,7 +280,11 @@ public class TerminalWindow {
             }
 
             public int getRowCount() {
-                return s3270.getScreen().getFields().size();
+                try {
+                    return s3270.getScreen().getFields().size();
+                } catch (RuntimeException e) {
+                    return 1;
+                }
             }
 
             @Override

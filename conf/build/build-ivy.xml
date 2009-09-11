@@ -10,7 +10,8 @@
     <taskdef name="ivy-cachepath" classname="org.apache.ivy.ant.IvyCachePath" loaderRef="ivy.loader" classpathref="ivy.classpath"/>
     <taskdef name="ivy-publish" classname="org.apache.ivy.ant.IvyPublish" loaderRef="ivy.loader" classpathref="ivy.classpath"/>
     <taskdef name="ivy-report" classname="org.apache.ivy.ant.IvyReport" loaderRef="ivy.loader" classpathref="ivy.classpath"/>
-
+	<taskdef name="ivy-eclipse" classname="ivyeclipse.IvyEclipse" loaderRef="ivy.loader" classpathref="ivy.classpath"/>
+	
 	<target name="ivy-dependencies-setup">
         <ivy-configure file="${basedir}/conf/build/ivysettings.xml"/>
     </target>
@@ -44,5 +45,10 @@
 	<target name ="purge-ivy-cache">
 		<delete dir="${user.home}/ivy" failonerror="true"/>
 	</target>
+	
+    <target name="eclipse-classpath" depends="ivy-dependencies" description="creates .classpath file from ivy configuration">
+    	<property name="ivy-eclipse.exclude" value=""/>
+        <ivy-eclipse conf="test" exclude="${ivy-eclipse.exclude}"/>
+    </target>
 
 </project>

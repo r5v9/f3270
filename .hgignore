@@ -1,5 +1,4 @@
 syntax: glob
 bin
-
-syntax: glob
 target
+.classpath

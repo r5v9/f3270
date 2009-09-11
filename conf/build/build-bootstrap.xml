@@ -4,6 +4,7 @@
 
     <path id="ivy.classpath">
         <pathelement path="${basedir}/conf/build/bootstrap/ivy-2.0.0.jar"/>
+    	<pathelement path="${basedir}/conf/build/bootstrap/ivyeclipse-0.4.jar"/>
     </path>
 
 	<taskdef resource="net/sf/antcontrib/antlib.xml" classpath="${basedir}/conf/build/bootstrap/ant-contrib-1.0b3.jar"/>
