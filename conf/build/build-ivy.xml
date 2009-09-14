@@ -29,9 +29,13 @@
         <ivy-cachepath pathid="test.classpath" conf="test" type="jar" />
     </target>
 
-    <target name="publish">
-    	<property file="${basedir}/revision.properties"/>
-        <ivy-publish resolver="local" pubrevision="${release}" overwrite="true">
+    <target name="publish" depends="ivy-dependencies">
+    	<exec executable="hg" outputproperty="hg.revision">
+    		<arg line="id -n"/>
+    	</exec>
+		<propertyregex property="revision" input="${hg.revision}" regexp="([0-9]+)" select="\1" casesensitive="false" />
+    	<echo message="revision: ${revision}"/>
+        <ivy-publish resolver="local" pubrevision="${revision}" overwrite="true">
             <artifacts pattern="${basedir}/target/dist/[artifact].[ext]" />
         </ivy-publish>
     </target>

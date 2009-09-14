@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivysettings>
 
-    <property name="cache.dir" value="${basedir}/../ivy-f3270/cache"/>
+    <property name="cache.dir" value="${basedir}/../ivy/f3270/cache"/>
     <property name="3rdParty.dir" value="${basedir}/ivy-repository"/>
-    <property name="local.dir" value="${basedir}/../ivy-f3270/local"/>
+    <property name="local.dir" value="${basedir}/../ivy/f3270/local"/>
 
     <settings defaultResolver="default" defaultConflictManager="strict">
         <caches defaultCacheDir="${cache.dir}" checkUpToDate="true"/>
