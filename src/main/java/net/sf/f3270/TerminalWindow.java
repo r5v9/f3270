@@ -29,15 +29,12 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
-import org.apache.log4j.Logger;
 import org.h3270.host.Field;
 import org.h3270.host.InputField;
 import org.h3270.host.S3270;
 
 public class TerminalWindow {
 	
-	private static final Logger log = Logger.getLogger(TerminalWindow.class);
-
 	private S3270 s3270;
 	private int currentWidth;
 	private int currentHeight;

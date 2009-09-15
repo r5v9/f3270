@@ -28,14 +28,16 @@ public class Terminal {
     private final int port;
     private final TerminalType type;
     private final TerminalMode mode;
+	private final boolean showTerminalWindow;
 
     public Terminal(final String s3270Path, final String hostname, final int port, final TerminalType type,
-            final TerminalMode mode) {
+            final TerminalMode mode, final boolean showTerminalWindow) {
         this.s3270Path = s3270Path;
         this.hostname = hostname;
         this.port = port;
         this.type = type;
         this.mode = mode;
+		this.showTerminalWindow = showTerminalWindow;
     }
 
     private void addDefaultObservers() {
@@ -44,24 +46,9 @@ public class Terminal {
                 printScreen();
             }
         });
-        addObserver(new TerminalObserver() {
-            private TerminalWindow terminalWindow;
-
-            public void commandIssued(String command, String returned, Param... params) {
-                terminalWindow.update(command, returned, params);
-            }
-
-            public void connect(S3270 s3270) {
-                terminalWindow = new TerminalWindow(s3270);
-                terminalWindow.update("new Terminal", null, new Param("hostname", s3270.getHostname()), new Param(
-                        "port", s3270.getPort()), new Param("type", s3270.getType().getType()), new Param("mode", s3270
-                        .getMode().getMode()));
-            }
-
-            public void disconnect() {
-                terminalWindow.close();
-            }
-        });
+        if (showTerminalWindow) {
+        	addObserver(new TerminalWindowObserver());
+		}
     }
 
     public void addObserver(TerminalObserver observer) {
