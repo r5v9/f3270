@@ -54,6 +54,10 @@ public class Terminal {
     public void addObserver(TerminalObserver observer) {
         observers.add(observer);
     }
+    
+    public void removeObserver(TerminalObserver observer) {
+        observers.remove(observer);
+    }
 
     public Terminal connect() {
         s3270 = new S3270(s3270Path, hostname, port, type, mode);
