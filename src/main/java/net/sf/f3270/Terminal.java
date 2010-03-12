@@ -179,7 +179,7 @@ public class Terminal {
                     + " match mode [%s] is not an input field", f.getValue().trim(), matchNumber, label, skip,
                     matchMode));
         }
-        s3270.getScreen().getInputFieldAt(f.getStartX(), f.getStartY()).setValue(value);
+        ((InputField)f).setValue(value);
 
         commandIssued("write", null, buildParams(label, value, skip, matchNumber, matchMode));
     }
