@@ -64,6 +64,11 @@ public class InputField extends Field {
     public boolean isChanged() {
         return this.changed;
     }
+    
+    @Override
+    public boolean isWritable() {
+        return true;
+    }
 
     /**
      * Sets the value of this Field. This method does not work for multiline fields; use setValue(int, String) instead.

@@ -255,6 +255,10 @@ public class Field {
     public boolean isHidden() {
         return displayMode == DISPLAY_HIDDEN;
     }
+    
+    public boolean isWritable() {
+        return false;
+    }
 
     /**
      * If this Field has an extended color, returns the index of that color (0xf1 through 0xf7). If this Field does not
