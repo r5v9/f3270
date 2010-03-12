@@ -12,11 +12,11 @@
     <resolvers>
         <url name="3rdParty">
             <ivy pattern="file:${3rdParty.dir}/[organisation]/[module]/[revision]/ivy.xml"/>
-            <artifact pattern="file:${3rdParty.dir}/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]"/>
+            <artifact pattern="file:${3rdParty.dir}/[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]"/>
         </url>
         <filesystem name="local">
             <ivy pattern="${local.dir}/[organisation]/[module]/[revision]/ivy.xml"/>
-            <artifact pattern="${local.dir}/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
+            <artifact pattern="${local.dir}/[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]" />
         </filesystem>
         <chain name="default" returnFirst="true">
             <resolver ref="local"/>
