@@ -227,6 +227,19 @@ public class Terminal {
         return params.toArray(paramsArray);
     }
 
+
+    public Field fieldAfterLabel(final String label) {
+        return fieldAfterLabel(label, 1);
+    }
+    
+    public Field fieldAfterLabel(final String label, final int skip) {
+        return fieldAfterLabel(label, skip, 1);
+    }
+    
+    public Field fieldAfterLabel(final String label, final int skip, final int matchNumber) {
+        return fieldAfterLabel(label, skip, matchNumber, DEFAULT_MATCH_MODE);
+    }
+    
     public Field fieldAfterLabel(final String label, final int skip, final int matchNumber, final MatchMode matchMode) {
         assertConnected();
         final List<Field> fields = s3270.getScreen().getFields();
