@@ -2,6 +2,8 @@
 
 <project name="f3270" default="all">
 
+	<property name="project.version" value="1.0" />
+	
     <target name="all" depends="clean, ivy-dependencies, compile, test, build-jar, publish" />
 	
 	<target name="pre-build-jar">
