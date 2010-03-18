@@ -129,6 +129,7 @@ public class Terminal {
 
     public void pf(final int n) {
         assertConnected();
+        s3270.submitScreen();
         s3270.pf(n);
         updateScreen();
         commandIssued("pf", null, new Param("n", n));
