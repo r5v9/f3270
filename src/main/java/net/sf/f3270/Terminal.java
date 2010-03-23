@@ -13,7 +13,6 @@ import org.h3270.host.S3270.TerminalType;
 import org.h3270.render.TextRenderer;
 
 public class Terminal {
-
     public enum MatchMode {
         EXACT, EXACT_AFTER_TRIM, REGEX, CONTAINS;
     };
@@ -38,14 +37,12 @@ public class Terminal {
         this.type = type;
         this.mode = mode;
 		this.showTerminalWindow = showTerminalWindow;
+
+        addDefaultObservers();
     }
 
     private void addDefaultObservers() {
-        addObserver(new TerminalObserver() {
-            public void screenUpdated() {
-                printScreen();
-            }
-        });
+        addObserver(new TerminalScreenToConsoleObserver());
         if (showTerminalWindow) {
         	addObserver(new TerminalWindowObserver());
 		}
@@ -62,7 +59,6 @@ public class Terminal {
     public Terminal connect() {
         s3270 = new S3270(s3270Path, hostname, port, type, mode);
         updateScreen();
-        addDefaultObservers();
         for (TerminalObserver observer : observers) {
             observer.connect(s3270);
         }
@@ -155,6 +151,13 @@ public class Terminal {
         commandIssued("type", null, new Param("text", text));
     }
 
+    public void clearScreen() {
+        assertConnected();
+        s3270.eraseEOF();
+        updateScreen();
+        commandIssued("clearScreen", null);
+    }
+
     public void write(final String label, final String value) {
         write(label, value, 1, DEFAULT_MATCH_MODE);
     }
@@ -227,7 +230,6 @@ public class Terminal {
         final Param[] paramsArray = new Param[params.size()];
         return params.toArray(paramsArray);
     }
-
 
     public Field fieldAfterLabel(final String label) {
         return fieldAfterLabel(label, 1);
@@ -303,17 +305,17 @@ public class Terminal {
         }
     }
 
+    private static final String SCREEN_SEPARATOR = "+--------------------------------------------------------------------------------+";
     public void printScreen() {
         assertConnected();
         final String[] lines = getScreenText().split("\n");
-        final String sep = "+--------------------------------------------------------------------------------+";
         final String blanks = "                                                                                ";
-        println(sep);
+        println(SCREEN_SEPARATOR);
         for (String line : lines) {
             final String fixedLine = (line + blanks).substring(0, 80);
             println(String.format("|%s|", fixedLine));
         }
-        println(sep);
+        println(SCREEN_SEPARATOR);
     }
 
     private void println(final String s) {
@@ -321,4 +323,9 @@ public class Terminal {
         out.println(s);
     }
 
+    private class TerminalScreenToConsoleObserver extends TerminalObserver {
+        public void screenUpdated() {
+            printScreen();
+        }
+    }
 }
