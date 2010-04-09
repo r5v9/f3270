@@ -13,9 +13,11 @@ import org.h3270.host.S3270.TerminalType;
 import org.h3270.render.TextRenderer;
 
 public class Terminal {
+    private static final int SCREEN_WIDTH_IN_CHARS = 80;
+
     public enum MatchMode {
-        EXACT, EXACT_AFTER_TRIM, REGEX, CONTAINS;
-    };
+        EXACT, EXACT_AFTER_TRIM, REGEX, CONTAINS
+    }
 
     private static final MatchMode DEFAULT_MATCH_MODE = MatchMode.CONTAINS;
 
@@ -42,7 +44,7 @@ public class Terminal {
     }
 
     private void addDefaultObservers() {
-        addObserver(new TerminalScreenToConsoleObserver());
+        addObserver(new TerminalScreenToConsoleObserver(this));
         if (showTerminalWindow) {
         	addObserver(new TerminalWindowObserver());
 		}
@@ -146,8 +148,8 @@ public class Terminal {
 
     public void type(final String text) {
         assertConnected();
-        final InputField f = s3270.getScreen().getFocusedField();
-        f.setValue(text);
+        InputField field = s3270.getScreen().getFocusedField();
+        field.setValue(text);
         commandIssued("type", null, new Param("text", text));
     }
 
@@ -177,13 +179,13 @@ public class Terminal {
     public void write(final String label, final String value, final int skip, final int matchNumber,
             final MatchMode matchMode) {
         assertConnected();
-        final Field f = fieldAfterLabel(label, skip, matchNumber, matchMode);
-        if (!(f instanceof InputField)) {
+        Field field = fieldAfterLabel(label, skip, matchNumber, matchMode);
+        if (!(field instanceof InputField)) {
             throw new RuntimeException(String.format("field [%s] after match [%d] for [%s] with skip [%d] found with"
-                    + " match mode [%s] is not an input field", f.getValue().trim(), matchNumber, label, skip,
+                    + " match mode [%s] is not an input field", field.getValue().trim(), matchNumber, label, skip,
                     matchMode));
         }
-        ((InputField)f).setValue(value);
+        ((InputField)field).setValue(value);
 
         commandIssued("write", null, buildParams(label, value, skip, matchNumber, matchMode));
     }
@@ -206,9 +208,9 @@ public class Terminal {
 
     public String read(final String label, final int skip, final int matchNumber, final MatchMode matchMode) {
         assertConnected();
-        final Field f = fieldAfterLabel(label, skip, matchNumber, matchMode);
-        commandIssued("read", f.getValue(), buildParams(label, null, skip, matchNumber, matchMode));
-        return f.getValue();
+        final Field field = fieldAfterLabel(label, skip, matchNumber, matchMode);
+        commandIssued("read", field.getValue(), buildParams(label, null, skip, matchNumber, matchMode));
+        return field.getValue();
     }
 
     private Param[] buildParams(final String label, final String value, final int skip, final int matchNumber,
@@ -253,8 +255,7 @@ public class Terminal {
         }
         final int index = i + skip;
         if (index >= fields.size()) {
-            throw new RuntimeException(String.format("field [%s] at index [%i] plus skip [%i]"
-                    + " exceed the number of available fields in the screen [%i]", label, i, skip, index));
+            throw new RuntimeException(String.format("field [%s] at index [%i] plus skip [%i] exceed the number of available fields in the screen [%i]", label, i, skip, index));
         }
         return fields.get(index);
     }
@@ -312,7 +313,7 @@ public class Terminal {
         final String blanks = "                                                                                ";
         println(SCREEN_SEPARATOR);
         for (String line : lines) {
-            final String fixedLine = (line + blanks).substring(0, 80);
+            final String fixedLine = (line + blanks).substring(0, SCREEN_WIDTH_IN_CHARS);
             println(String.format("|%s|", fixedLine));
         }
         println(SCREEN_SEPARATOR);
@@ -323,9 +324,4 @@ public class Terminal {
         out.println(s);
     }
 
-    private class TerminalScreenToConsoleObserver extends TerminalObserver {
-        public void screenUpdated() {
-            printScreen();
-        }
-    }
 }

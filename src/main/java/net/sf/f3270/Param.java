@@ -33,4 +33,8 @@ public class Param {
         return value;
     }
 
+    @Override
+    public String toString() {
+        return name + "=" + value;
+    }
 }

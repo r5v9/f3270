@@ -18,6 +18,7 @@
     <dependencies>
         <dependency org="junit" name="junit" rev="4.5" conf="test->default,source"/>
         <dependency org="apache" name="log4j" rev="1.2.15" conf="default->default,source"/>
+        <dependency org="apache" name="commons-lang" rev="2.4" conf="default->default"/>
         <dependency org="apache" name="commons-io" rev="1.4" conf="test->default"/>
     </dependencies>
 

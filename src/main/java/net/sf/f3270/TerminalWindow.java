@@ -144,7 +144,6 @@ public class TerminalWindow {
 		if (returned != null) {
 			appendText(documentDebug, " = ", stylePunctuation);
 			appendText(documentDebug, "\"" + returned + "\"", styleReturn);
-
 		}
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
