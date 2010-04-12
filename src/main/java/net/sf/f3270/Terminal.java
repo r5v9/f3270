@@ -1,5 +1,6 @@
 package net.sf.f3270;
 
+import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -137,6 +138,7 @@ public class Terminal {
         assertConnected();
         s3270.pa(n);
         updateScreen();
+        commandIssued("pa", null, new Param("n", n));
     }
     
     public void clear() {
@@ -299,29 +301,32 @@ public class Terminal {
 
     public void printFields() {
         assertConnected();
+        printFields(System.out);
+    }
+
+    void printFields(PrintStream stream) {
         final List<Field> fields = s3270.getScreen().getFields();
         for (int i = 0; i < fields.size(); i++) {
             final String value = fields.get(i).getValue();
-            println(String.format("%d=[%s]", i, value));
+            stream.println(String.format("%d=[%s]", i, value));
         }
     }
 
     private static final String SCREEN_SEPARATOR = "+--------------------------------------------------------------------------------+";
     public void printScreen() {
+        printScreen(System.out);
+    }
+
+    void printScreen(PrintStream stream) {
         assertConnected();
         final String[] lines = getScreenText().split("\n");
         final String blanks = "                                                                                ";
-        println(SCREEN_SEPARATOR);
+        stream.println(SCREEN_SEPARATOR);
         for (String line : lines) {
             final String fixedLine = (line + blanks).substring(0, SCREEN_WIDTH_IN_CHARS);
-            println(String.format("|%s|", fixedLine));
+            stream.println(String.format("|%s|", fixedLine));
         }
-        println(SCREEN_SEPARATOR);
-    }
-
-    private void println(final String s) {
-        final PrintStream out = System.out;
-        out.println(s);
+        stream.println(SCREEN_SEPARATOR);
     }
 
 }
