@@ -2,9 +2,9 @@ package net.sf.f3270.ipaustralia;
 
 import static org.junit.Assert.assertTrue;
 
+import net.sf.f3270.FieldIdentifier;
 import net.sf.f3270.IntegrationTestBase;
 import net.sf.f3270.Terminal;
-import net.sf.f3270.IntegrationTestBase.Mode;
 
 import org.junit.Test;
 
@@ -19,7 +19,7 @@ public class IpAustraliaTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testIpaustralia() {
+    public void testIpAustralia() {
         connect();
 
         assertText(terminal, "A U S T R A L I A");
@@ -29,13 +29,13 @@ public class IpAustraliaTest extends IntegrationTestBase {
         assertText(terminal, "Logon in progress...");
         sleep(100);
         terminal.enter();
-        terminal.write("command", "1");
-        terminal.read("command");
+        terminal.write(new FieldIdentifier("command"), "1");
+        terminal.read(new FieldIdentifier("command"));
         terminal.enter();
         terminal.enter();
-        terminal.write("command", "2");
+        terminal.write(new FieldIdentifier("command"), "2");
         terminal.enter();
-        terminal.write("trade mark number", "123");
+        terminal.write(new FieldIdentifier("trade mark number"), "123");
 
         disconnect();
     }
