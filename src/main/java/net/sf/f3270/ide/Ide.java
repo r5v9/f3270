@@ -28,7 +28,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 
-import net.sf.f3270.Param;
+import net.sf.f3270.Parameter;
 
 public class Ide {
 
@@ -166,7 +166,7 @@ public class Ide {
             }
 
             public Object getElementAt(int i) {
-                return new Command("write", new Param("label", "whatever"), new Param("value", "something"));
+                return new Command("write", new Parameter("label", "whatever"), new Parameter("value", "something"));
             }
         };
     }

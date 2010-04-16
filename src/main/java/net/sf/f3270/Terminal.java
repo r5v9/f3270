@@ -1,8 +1,8 @@
 package net.sf.f3270;
 
-import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.h3270.host.Field;
@@ -16,14 +16,9 @@ import org.h3270.render.TextRenderer;
 public class Terminal {
     private static final int SCREEN_WIDTH_IN_CHARS = 80;
 
-    public enum MatchMode {
-        EXACT, EXACT_AFTER_TRIM, REGEX, CONTAINS
-    }
-
-    private static final MatchMode DEFAULT_MATCH_MODE = MatchMode.CONTAINS;
 
     private S3270 s3270;
-    private List<TerminalObserver> observers = new ArrayList<TerminalObserver>();
+    private final Collection<TerminalObserver> observers = new ArrayList<TerminalObserver>();
 
     private final String s3270Path;
     private final String hostname;
@@ -31,6 +26,8 @@ public class Terminal {
     private final TerminalType type;
     private final TerminalMode mode;
 	private final boolean showTerminalWindow;
+    private static final char MAINFRAME_BLANK_CHAR = '\u0000';
+    private static final char SINGLE_SPACE = ' ';
 
     public Terminal(final String s3270Path, final String hostname, final int port, final TerminalType type,
             final TerminalMode mode, final boolean showTerminalWindow) {
@@ -65,6 +62,7 @@ public class Terminal {
         for (TerminalObserver observer : observers) {
             observer.connect(s3270);
         }
+        commandIssued("connect", null);
         return this;
     }
 
@@ -82,9 +80,9 @@ public class Terminal {
         }
     }
 
-    private void commandIssued(String command, String returned, Param... params) {
+    private void commandIssued(String command, String returned, Parameter... parameters) {
         for (TerminalObserver observer : observers) {
-            observer.commandIssued(command, returned, params);
+            observer.commandIssued(command, returned, parameters);
         }
     }
 
@@ -105,11 +103,11 @@ public class Terminal {
         final Screen screen = s3270.getScreen();
         final StringBuilder sb = new StringBuilder();
         for (int col = 0; col < screen.getWidth(); col++) {
-            sb.append(screen.charAt(col, line));
+            sb.append(replaceNull(screen.charAt(col, line)));
         }
         return sb.toString();
     }
-    
+
     public int getWidth() {
         return s3270.getScreen().getWidth();
     }
@@ -131,14 +129,14 @@ public class Terminal {
         s3270.submitScreen();
         s3270.pf(n);
         updateScreen();
-        commandIssued("pf", null, new Param("n", n));
+        commandIssued("pf", null, new Parameter("n", n));
     }
 
     public void pa(final int n) {
         assertConnected();
         s3270.pa(n);
         updateScreen();
-        commandIssued("pa", null, new Param("n", n));
+        commandIssued("pa", null, new Parameter("n", n));
     }
     
     public void clear() {
@@ -152,7 +150,7 @@ public class Terminal {
         assertConnected();
         InputField field = s3270.getScreen().getFocusedField();
         field.setValue(text);
-        commandIssued("type", null, new Param("text", text));
+        commandIssued("type", null, new Parameter("text", text));
     }
 
     public void clearScreen() {
@@ -162,152 +160,190 @@ public class Terminal {
         commandIssued("clearScreen", null);
     }
 
+    /**
+     * @deprecated Use {@link @link Terminal#write (FieldIdentifier)} instead
+     */
+    // TODO : delete method (deprecated on 2010-04-15)
     public void write(final String label, final String value) {
-        write(label, value, 1, DEFAULT_MATCH_MODE);
+        write(new FieldIdentifier(label), value);
     }
 
+    /**
+     * @deprecated Use {@link @link Terminal#write (FieldIdentifier)} instead
+     */
+    // TODO : delete method (deprecated on 2010-04-15)
     public void write(final String label, final String value, final MatchMode matchMode) {
-        write(label, value, 1, matchMode);
+        write(new FieldIdentifier(label, matchMode), value);
     }
 
+    /**
+     * @deprecated Use {@link @link Terminal#write (FieldIdentifier)} instead
+     */
+    // TODO : delete method (deprecated on 2010-04-15)
     public void write(final String label, final String value, final int skip) {
-        write(label, value, skip, DEFAULT_MATCH_MODE);
+        write(new FieldIdentifier(label, skip), value);
     }
 
+    /**
+     * @deprecated Use {@link @link Terminal#write (FieldIdentifier)} instead
+     */
+    // TODO : delete method (deprecated on 2010-04-15)
     public void write(final String label, final String value, final int skip, final MatchMode matchMode) {
-        write(label, value, skip, 1, matchMode);
+        write(new FieldIdentifier(label, skip, matchMode), value);
     }
 
-    public void write(final String label, final String value, final int skip, final int matchNumber,
-            final MatchMode matchMode) {
+    /**
+     * @deprecated Use {@link @link Terminal#write (FieldIdentifier)} instead
+     */
+    // TODO : delete method (deprecated on 2010-04-15)
+    public void write(String label, String value, int skip, int matchNumber, MatchMode matchMode) {
+        write(new FieldIdentifier(label, skip, matchNumber, matchMode), value);
+    }
+
+    public void write(FieldIdentifier fieldIdentifier, String value) {
         assertConnected();
-        Field field = fieldAfterLabel(label, skip, matchNumber, matchMode);
-        if (!(field instanceof InputField)) {
-            throw new RuntimeException(String.format("field [%s] after match [%d] for [%s] with skip [%d] found with"
-                    + " match mode [%s] is not an input field", field.getValue().trim(), matchNumber, label, skip,
-                    matchMode));
-        }
-        ((InputField)field).setValue(value);
-
-        commandIssued("write", null, buildParams(label, value, skip, matchNumber, matchMode));
+        getInputField(fieldIdentifier).setValue(value);
+        commandIssued("write", null, buildParameters(fieldIdentifier, value));
     }
 
+    /**
+     * @deprecated Use {@link @link Terminal#read (FieldIdentifier)} instead
+     */
+    // TODO : delete method (deprecated on 2010-04-15)
     public String read(final String label) {
-        return read(label, 1, DEFAULT_MATCH_MODE);
+        return read(new FieldIdentifier(label));
     }
 
+    /**
+     * @deprecated Use {@link @link Terminal#read (FieldIdentifier)} instead
+     */
+    // TODO : delete method (deprecated on 2010-04-15)
     public String read(final String label, final int skip) {
-        return read(label, skip, DEFAULT_MATCH_MODE);
+        return read(new FieldIdentifier(label, skip));
     }
 
+    /**
+     * @deprecated Use {@link @link Terminal#read (FieldIdentifier)} instead
+     */
+    // TODO : delete method (deprecated on 2010-04-15)
     public String read(final String label, final MatchMode matchMode) {
-        return read(label, 1, matchMode);
+        return read(new FieldIdentifier(label, matchMode));
     }
 
+    /**
+     * @deprecated Use {@link @link Terminal#read (FieldIdentifier)} instead
+     */
+    // TODO : delete method (deprecated on 2010-04-15)
     public String read(final String label, final int skip, final MatchMode matchMode) {
-        return read(label, skip, 1, matchMode);
+        return read(new FieldIdentifier(label, skip, matchMode));
     }
 
+    /**
+     * @deprecated Use {@link @link Terminal#read (FieldIdentifier)} instead
+     */
+    // TODO : delete method (deprecated on 2010-04-15)
     public String read(final String label, final int skip, final int matchNumber, final MatchMode matchMode) {
-        assertConnected();
-        final Field field = fieldAfterLabel(label, skip, matchNumber, matchMode);
-        commandIssued("read", field.getValue(), buildParams(label, null, skip, matchNumber, matchMode));
-        return field.getValue();
+        return read(new FieldIdentifier(label, skip, matchNumber, matchMode));
     }
 
-    private Param[] buildParams(final String label, final String value, final int skip, final int matchNumber,
-            final MatchMode matchMode) {
-        final List<Param> params = new ArrayList<Param>();
-        params.add(new Param("label", label));
+    public String read(FieldIdentifier fieldIdentifier) {
+        assertConnected();
+        Field field = getField(fieldIdentifier);
+        String value = read(field);
+        commandIssued("read", value, buildParameters(fieldIdentifier, null));
+        return value;
+    }
+
+    private InputField getInputField(FieldIdentifier fieldIdentifier) {
+        Field field = getField(fieldIdentifier);
+        if (!(field instanceof InputField)) {
+            throw new RuntimeException(
+                    String.format("field [%s] after match [%d] for [%s] with skip [%d] found with match mode [%s] is not an input field",
+                    read(field),
+                    fieldIdentifier.matchNumber,
+                    fieldIdentifier.label,
+                    fieldIdentifier.skip,
+                    fieldIdentifier.matchMode));
+        }
+        return (InputField) field;
+    }
+
+    private String read(Field field) {
+        return replaceNulls(field.getValue()).trim();
+    }
+
+    private String replaceNulls(String value) {
+        return value.replace(MAINFRAME_BLANK_CHAR, SINGLE_SPACE);
+    }
+
+    private char replaceNull(char c) {
+        return c == MAINFRAME_BLANK_CHAR ? SINGLE_SPACE : c;
+    }
+
+    private Parameter[] buildParameters(FieldIdentifier fieldIdentifier, String value) {
+        Collection<Parameter> parameters = fieldIdentifier.buildParameters();
         if (value != null) {
-            params.add(new Param("value", value.replace('\u0000', ' ')));
+            parameters.add(new Parameter("value", value));
         }
-        if (skip != 1) {
-            params.add(new Param("skip", skip));
-        }
-        if (matchNumber != 1) {
-            params.add(new Param("matchNumber", matchNumber));
-        }
-        if (matchMode != DEFAULT_MATCH_MODE) {
-            params.add(new Param("matchMode", matchMode));
-        }
-        final Param[] paramsArray = new Param[params.size()];
-        return params.toArray(paramsArray);
+        return parameters.toArray(new Parameter[parameters.size()]);
     }
 
-    public Field fieldAfterLabel(final String label) {
-        return fieldAfterLabel(label, 1);
+    /**
+     * @deprecated Use {@link @link Terminal#getField (FieldIdentifier)} instead
+     */
+    // TODO : delete method (deprecated on 2010-04-15)
+    public Field fieldAfterLabel(String label) {
+        return getField(new FieldIdentifier(label));
     }
-    
-    public Field fieldAfterLabel(final String label, final int skip) {
-        return fieldAfterLabel(label, skip, 1);
+
+    /**
+     * @deprecated Use {@link @link Terminal#getField (FieldIdentifier)} instead
+     */
+    // TODO : delete method (deprecated on 2010-04-15)
+    public Field fieldAfterLabel(String label, int skip) {
+        return getField(new FieldIdentifier(label, skip));
     }
-    
-    public Field fieldAfterLabel(final String label, final int skip, final int matchNumber) {
-        return fieldAfterLabel(label, skip, matchNumber, DEFAULT_MATCH_MODE);
+
+    /**
+     * @deprecated Use {@link @link Terminal#getField (FieldIdentifier)} instead
+     */
+    // TODO : delete method (deprecated on 2010-04-15)
+    public Field fieldAfterLabel(String label, int skip, int matchNumber) {
+        return getField(new FieldIdentifier(label, skip, matchNumber));
     }
-    
+
+    /**
+     * @deprecated Use {@link @link Terminal#getField (FieldIdentifier)} instead
+     */
+    // TODO : Inline into Terminal#getField (FieldIdentifier) (deprecated on 2010-04-15)
     public Field fieldAfterLabel(final String label, final int skip, final int matchNumber, final MatchMode matchMode) {
-        assertConnected();
-        final List<Field> fields = s3270.getScreen().getFields();
-        final int i = getFieldIndex(label, matchNumber, matchMode);
-        if (i == -1) {
-            throw new RuntimeException(String.format("field [%s] could not be found using match mode [%s]", label,
-                    matchMode));
-        }
-        final int index = i + skip;
-        if (index >= fields.size()) {
-            throw new RuntimeException(String.format("field [%s] at index [%i] plus skip [%i] exceed the number of available fields in the screen [%i]", label, i, skip, index));
-        }
-        return fields.get(index);
+        return getField(new FieldIdentifier(label, skip, matchNumber, matchMode));
     }
 
+    public Field getField(FieldIdentifier fieldIdentifier) {
+        assertConnected();
+        List<Field> fields = s3270.getScreen().getFields();
+        return fieldIdentifier.find(fields);
+    }
+
+    /**
+     * @deprecated Should not be using field indexes use other methods on {@link @link Terminal} to achieve desired behaviour
+     */
+    // TODO : delete method (deprecated on 2010-04-15)
     public int getFieldIndex(final String label, final int matchNumber, final MatchMode matchMode) {
         assertConnected();
-        final List<Field> fields = s3270.getScreen().getFields();
-        int matches = 0;
-        for (int i = 0; i < fields.size(); i++) {
-            final String value = fields.get(i).getValue().toLowerCase();
-            if (match(value, label.toLowerCase(), matchMode)) {
-                matches++;
-                if (matches == matchNumber) {
-                    return i;
-                }
-            }
-        }
-        return -1;
-    }
-
-    private boolean match(final String value, final String label, final MatchMode matchMode) {
-        return matchExact(value, label, matchMode) || matchExactAfterTrim(value, label, matchMode)
-                || matchRegex(value, label, matchMode) || matchContains(value, label, matchMode);
-    }
-
-    private boolean matchExact(final String value, final String label, final MatchMode matchMode) {
-        return matchMode == MatchMode.EXACT && value.equals(label);
-    }
-
-    private boolean matchExactAfterTrim(final String value, final String label, final MatchMode matchMode) {
-        return matchMode == MatchMode.EXACT_AFTER_TRIM && value.trim().equals(label);
-    }
-
-    private boolean matchRegex(final String value, final String label, final MatchMode matchMode) {
-        return matchMode == MatchMode.REGEX && value.matches(label);
-    }
-
-    private boolean matchContains(final String value, final String label, final MatchMode matchMode) {
-        return matchMode == MatchMode.CONTAINS && value.contains(label);
+        return new FieldIdentifier(label, matchNumber, matchMode).getFieldIndexOfLabel(s3270.getScreen().getFields());
     }
 
     public void printFields() {
-        assertConnected();
         printFields(System.out);
     }
 
-    void printFields(PrintStream stream) {
-        final List<Field> fields = s3270.getScreen().getFields();
+    public void printFields(PrintStream stream) {
+        assertConnected();
+        List<Field> fields = s3270.getScreen().getFields();
         for (int i = 0; i < fields.size(); i++) {
-            final String value = fields.get(i).getValue();
+            String value = replaceNulls(fields.get(i).getValue());
             stream.println(String.format("%d=[%s]", i, value));
         }
     }
@@ -317,7 +353,7 @@ public class Terminal {
         printScreen(System.out);
     }
 
-    void printScreen(PrintStream stream) {
+    public void printScreen(PrintStream stream) {
         assertConnected();
         final String[] lines = getScreenText().split("\n");
         final String blanks = "                                                                                ";

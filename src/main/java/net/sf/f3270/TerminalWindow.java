@@ -91,9 +91,9 @@ public class TerminalWindow {
 	}
 
 	public void update(final String command, final String returned,
-			final Param... params) {
+			final Parameter... parameters) {
 		updateTerminal();
-		updateDebug(command, returned, params);
+		updateDebug(command, returned, parameters);
 		updateFieldsTable();
 	}
 
@@ -126,17 +126,17 @@ public class TerminalWindow {
 	}
 
 	private void updateDebug(final String command, final String returned,
-			final Param... params) {
+			final Parameter... parameters) {
 		if (documentDebug.getLength() > 0) {
 			appendText(documentDebug, "\n", stylePunctuation);
 		}
 		appendText(documentDebug, command, styleCommand);
 		appendText(documentDebug, "(", stylePunctuation);
-		for (int i = 0; i < params.length; i++) {
-			appendText(documentDebug, params[i].getName(), styleParamName);
+		for (int i = 0; i < parameters.length; i++) {
+			appendText(documentDebug, parameters[i].getName(), styleParamName);
 			appendText(documentDebug, "=", stylePunctuation);
-			appendText(documentDebug, params[i].getValue(), styleParamValue);
-			if (i != params.length - 1) {
+			appendText(documentDebug, parameters[i].getValue(), styleParamValue);
+			if (i != parameters.length - 1) {
 				appendText(documentDebug, ", ", stylePunctuation);
 			}
 		}

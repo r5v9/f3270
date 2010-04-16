@@ -1,26 +1,26 @@
 package net.sf.f3270;
 
-public class Param {
+public class Parameter {
 
     private String name;
     private String value;
 
-    public Param(final String name, final String value) {
+    public Parameter(final String name, final String value) {
         this.name = name;
         this.value = "\"" + value + "\"";
     }
 
-    public Param(final String name, final int value) {
+    public Parameter(final String name, final int value) {
         this.name = name;
         this.value = "" + value;
     }
 
-    public Param(final String name, final boolean value) {
+    public Parameter(final String name, final boolean value) {
         this.name = name;
         this.value = "" + value;
     }
 
-    public Param(final String name, final Terminal.MatchMode value) {
+    public Parameter(final String name, final MatchMode value) {
         this.name = name;
         this.value = "" + value;
     }

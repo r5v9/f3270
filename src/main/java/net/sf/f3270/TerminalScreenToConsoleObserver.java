@@ -25,9 +25,9 @@ public class TerminalScreenToConsoleObserver extends TerminalObserver {
     }
 
     @Override
-    public void commandIssued(String command, String returned, Param... params) {
-        super.commandIssued(command, returned, params);
-        String output = MessageFormat.format("{0}({1})", command, StringUtils.join(params, ", "));
+    public void commandIssued(String command, String returned, Parameter... parameters) {
+        super.commandIssued(command, returned, parameters);
+        String output = MessageFormat.format("{0}({1})", command, StringUtils.join(parameters, ", "));
         if (returned != null) {
             output += ("=" + returned);
         }

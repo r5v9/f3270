@@ -9,16 +9,16 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 
-import net.sf.f3270.Param;
+import net.sf.f3270.Parameter;
 
 class Command {
 
     protected String command;
-    protected Param[] params;
+    protected Parameter[] parameters;
 
-    Command(String command, Param... params) {
+    Command(String command, Parameter... parameters) {
         this.command = command;
-        this.params = params;
+        this.parameters = parameters;
     }
 
     final JPanel toPanel(JList list, boolean isSelected) {
@@ -39,12 +39,12 @@ class Command {
         addLabel(panel, " ", Color.white);
         addLabel(panel, command, Color.black);
         addLabel(panel, "(", Color.gray);
-        for (int i = 0; i < params.length; i++) {
-            Param param = params[i];
-            addLabel(panel, param.getName(), new Color(128, 0, 0));
+        for (int i = 0; i < parameters.length; i++) {
+            Parameter parameter = parameters[i];
+            addLabel(panel, parameter.getName(), new Color(128, 0, 0));
             addLabel(panel, "=", Color.gray);
-            addLabel(panel, param.getValue(), Color.blue);
-            if (i != params.length - 1) {
+            addLabel(panel, parameter.getValue(), Color.blue);
+            if (i != parameters.length - 1) {
                 addLabel(panel, ", ", Color.gray);
             }
         }
