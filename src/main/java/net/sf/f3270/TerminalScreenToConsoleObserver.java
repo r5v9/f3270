@@ -1,9 +1,7 @@
 package net.sf.f3270;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.text.MessageFormat;
 
 import org.apache.commons.lang.StringUtils;
@@ -11,7 +9,6 @@ import org.apache.commons.lang.StringUtils;
 public class TerminalScreenToConsoleObserver extends TerminalObserver {
     private Terminal terminal;
     private String screenContents;
-    private PrintStream outputStream = System.out;
 
     public TerminalScreenToConsoleObserver(Terminal terminal) {
         this.terminal = terminal;
@@ -33,14 +30,14 @@ public class TerminalScreenToConsoleObserver extends TerminalObserver {
         if (returned != null) {
             output += ("=" + returned);
         }
-        outputStream.println(output);
+        System.out.println(output);
         delayedPrintScreen();
     }
 
     private void delayedPrintScreen() {
         if (screenContents != null) {
-            outputStream.println();
-            outputStream.print(screenContents);
+            System.out.println();
+            System.out.print(screenContents);
             screenContents = null;
         }
     }
