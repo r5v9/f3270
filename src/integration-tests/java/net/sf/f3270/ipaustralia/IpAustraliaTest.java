@@ -1,9 +1,10 @@
 package net.sf.f3270.ipaustralia;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import net.sf.f3270.FieldIdentifier;
 import net.sf.f3270.IntegrationTestBase;
+import net.sf.f3270.MatchMode;
 import net.sf.f3270.Terminal;
 
 import org.junit.Test;
@@ -29,6 +30,8 @@ public class IpAustraliaTest extends IntegrationTestBase {
         assertText(terminal, "Logon in progress...");
         sleep(100);
         terminal.enter();
+        assertEquals(Boolean.TRUE, (Boolean)terminal.screenHasLabel(new FieldIdentifier("command")));
+        assertEquals(Boolean.FALSE, (Boolean)terminal.screenHasLabel(new FieldIdentifier("rubbish_label")));
         terminal.write(new FieldIdentifier("command"), "1");
         terminal.read(new FieldIdentifier("command"));
         terminal.enter();

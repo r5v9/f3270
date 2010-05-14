@@ -334,6 +334,10 @@ public class Terminal {
         assertConnected();
         return new FieldIdentifier(label, matchNumber, matchMode).getFieldIndexOfLabel(s3270.getScreen().getFields());
     }
+    
+    public boolean screenHasLabel(FieldIdentifier fieldIdentifier) {
+        return fieldIdentifier.getFieldIndexOfLabel(s3270.getScreen().getFields()) != -1;
+    }
 
     public void printFields() {
         printFields(System.out);
