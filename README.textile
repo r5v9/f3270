@@ -1,0 +1,3 @@
+f3270 is a simple, easy-to-use Java framework for automating mainframe functional tests. It consists of an API to deal with fields in screens and a terminal GUI for debugging.
+
+!https://raw.github.com/rufiao/f3270/master/doc/f3270-screenshot.png!
