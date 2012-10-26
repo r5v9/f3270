@@ -205,6 +205,16 @@ public class Terminal {
         getInputField(fieldIdentifier).setValue(value);
         commandIssued("write", null, buildParameters(fieldIdentifier, value));
     }
+    
+    public void write(FieldIdentifier fieldIdentifier, int lineNumber, String value) {
+        assertConnected();
+        InputField inputField = getInputField(fieldIdentifier);
+        if(!inputField.isMultiline()){
+        	throw new RuntimeException("write method with Line Number can be used only with multi-line input field");
+        }
+		inputField.setValue(lineNumber, value);
+        commandIssued("write", null, buildParameters(fieldIdentifier, value));
+    }
 
     /**
      * @deprecated Use {@link @link Terminal#read (FieldIdentifier)} instead
