@@ -268,7 +268,7 @@ public class S3270Screen extends AbstractScreen {
 
     private Field createField(final byte startCode, final int startx, final int starty, final int endx, final int endy,
             final int color, final int extHighlight) {
-        if ((startCode & Field.ATTR_PROTECTED) == 0) {
+        if ((startCode & Field.ATTR_PROTECTED) == 0 || !isFormatted) {
             return new InputField(this, startCode, startx, starty, endx, endy, color, extHighlight);
         } else {
             return new Field(this, startCode, startx, starty, endx, endy, color, extHighlight);
