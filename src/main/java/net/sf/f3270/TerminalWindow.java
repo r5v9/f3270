@@ -35,12 +35,14 @@ import org.h3270.host.S3270;
 
 public class TerminalWindow {
 	
-	private S3270 s3270;
+	private static final String MASKED_VALUE = "****";
+    private S3270 s3270;
 	private int currentWidth;
 	private int currentHeight;
 
 	private Style styleInputChanged;
 	private Style styleInput;
+	private Style styleHidden;
 	private Style styleBlack;
 
 	private Style styleCommand;
@@ -83,6 +85,7 @@ public class TerminalWindow {
 	private void initializeStyles() {
 		styleInputChanged = createStyle(Color.black, Color.red, false);
 		styleInput = createStyle(Color.green, Color.black, false);
+		styleHidden= createStyle(Color.black, Color.black, false);
 		styleCommand = createStyle(Color.black, Color.white, false);
 		stylePunctuation = createStyle(Color.gray, Color.white, false);
 		styleReturn = createStyle(Color.magenta, Color.white, false);
@@ -159,6 +162,10 @@ public class TerminalWindow {
 
 	private Style getStyle(final Field f) {
 		final boolean isInput = f instanceof InputField;
+        if (f.isHidden()) {
+            return styleHidden;   
+        }
+        
 		if (isInput) {
 			final InputField inputField = (InputField) f;
 			if (inputField.isChanged()) {
@@ -182,13 +189,6 @@ public class TerminalWindow {
 		if (f.isIntensified()) {
 			foregroundColor = Color.white;
 		}
-
-		if (f.isHidden()) {
-			foregroundColor = Color.black;
-			backgroundColor = Color.black;
-			isUnderline = false;
-		}
-
 		return createStyle(foregroundColor, backgroundColor, isUnderline);
 	}
 
@@ -325,11 +325,16 @@ public class TerminalWindow {
 									.isChanged()) ? " *" : "");
 				}
 				if (columnIndex == 2) {
-					return "[" + f.getValue().replace('\u0000', ' ') + "]";
+					return getMaskedValueIfFieldIsHidden(f);
 				}
 				throw new RuntimeException("unknown column index "
 						+ columnIndex);
 			}
+
+            private String getMaskedValueIfFieldIsHidden(Field f) {
+                String value = f.isHidden() ? MASKED_VALUE : f.getValue().replace('\u0000', ' ');
+                return "[" + value + "]";
+            }
 
 			public boolean isCellEditable(final int rowIndex,
 					final int columnIndex) {

@@ -28,6 +28,7 @@ public class Terminal {
 	private final boolean showTerminalWindow;
     private static final char MAINFRAME_BLANK_CHAR = '\u0000';
     private static final char SINGLE_SPACE = ' ';
+    private static final String MASKED_VALUE = "****";
 
     public Terminal(final String s3270Path, final String hostname, final int port, final TerminalType type,
             final TerminalMode mode, final boolean showTerminalWindow) {
@@ -202,8 +203,9 @@ public class Terminal {
 
     public void write(FieldIdentifier fieldIdentifier, String value) {
         assertConnected();
-        getInputField(fieldIdentifier).setValue(value);
-        commandIssued("write", null, buildParameters(fieldIdentifier, value));
+        InputField inputField = getInputField(fieldIdentifier);
+        inputField.setValue(value);
+        commandIssued("write", null, buildParameters(fieldIdentifier, getMaskedValueIfFieldIsHidden(inputField, value)));
     }
     
     public void write(FieldIdentifier fieldIdentifier, int lineNumber, String value) {
@@ -213,7 +215,11 @@ public class Terminal {
         	throw new RuntimeException("write method with Line Number can be used only with multi-line input field");
         }
 		inputField.setValue(lineNumber, value);
-        commandIssued("write", null, buildParameters(fieldIdentifier, value));
+        commandIssued("write", null, buildParameters(fieldIdentifier, getMaskedValueIfFieldIsHidden(inputField, value)));
+    }
+    
+    private String getMaskedValueIfFieldIsHidden(InputField inputField, String value) {
+        return inputField.isHidden()? MASKED_VALUE : value;
     }
 
     /**
